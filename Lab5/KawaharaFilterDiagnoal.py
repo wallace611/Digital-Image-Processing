@@ -12,20 +12,31 @@ def Kuwahara(original, winsize):
         raise Exception ("Invalid winsize %s: winsize must follow formula: w = 4*n+1." %winsize)
 
     #Build subwindows
-    tmpAvgKerRow = np.hstack((np.ones((1,(winsize-1)//2+1)),np.zeros((1,(winsize-1)//2))))
-    tmpPadder = np.zeros((1,winsize))
-    tmpavgker = np.tile(tmpAvgKerRow, ((winsize-1)//2+1,1))
-    tmpavgker = np.vstack((tmpavgker, np.tile(tmpPadder, ((winsize-1)//2,1))))
-    tmpavgker = tmpavgker/np.sum(tmpavgker)
+    arr = []
+    for i in range(winsize):
+        count = winsize - i*2
+        if count > 0:
+            arr.append([])
+            for _ in range(i):
+                arr[i].append(0)
+            for _ in range(count):
+                arr[i].append(1)
+            for _ in range(i):
+                arr[i].append(0)
+        else:
+            arr.append([0 for _ in range(winsize)])
 
+    tmpavgker = np.array(arr)
+    tmpavgker = tmpavgker / np.sum(tmpavgker)
     # tmpavgker is a 'north-west' subwindow (marked as 'a' above)
     # we build a vector of convolution kernels for computing average and
     # variance
     avgker = np.empty((4,winsize,winsize)) # make an empty vector of arrays
-    avgker[0] = tmpavgker			# North-west (a)
-    avgker[1] = np.fliplr(tmpavgker)	# North-east (b)
-    avgker[2] = np.flipud(tmpavgker)	# South-west (c)
-    avgker[3] = np.fliplr(avgker[2])	# South-east (d)
+    avgker[0] = tmpavgker   
+    avgker[1] = np.rot90(avgker[0])
+    avgker[2] = np.rot90(avgker[1])
+    avgker[3] = np.rot90(avgker[2])
+    print(avgker)
     # Create a pixel-by-pixel square of the image
     squaredImg = image**2 
 # preallocate these arrays to make it apparently %15 faster
