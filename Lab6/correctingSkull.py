@@ -20,7 +20,6 @@ def unwrap(image, src, dst):
 a = io.imread("Digital-Image-Processing\\Lab6\\ambassadors.jpg")
 skull = a
 fig = plt.figure()
-
 # 擷取要進行校正的範圍
 src = np.float32([
     (303, 987),
